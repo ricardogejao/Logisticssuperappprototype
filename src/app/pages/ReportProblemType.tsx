@@ -1,16 +1,17 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { 
-  ArrowLeft, 
-  AlertTriangle, 
-  XCircle, 
-  MapPin, 
-  Truck, 
-  Clock, 
+import {
+  ArrowLeft,
+  AlertTriangle,
+  XCircle,
+  MapPin,
+  Truck,
+  Clock,
   MoreHorizontal,
   Search,
   ShieldCheck,
   FileText,
+  ClipboardX,
   ChevronRight,
   MessageCircle
 } from 'lucide-react';
@@ -21,7 +22,7 @@ import { Checkbox } from '../components/ui/checkbox';
 interface ProblemOption {
   id: string;
   label: string;
-  category: 'Coleta' | 'Veículo' | 'Segurança' | 'Entrega' | 'Documentação' | 'Outro';
+  category: 'Coleta' | 'Veículo' | 'Segurança' | 'Entrega' | 'Documentação' | 'Check List' | 'Outro';
   icon: React.ElementType;
 }
 
@@ -72,6 +73,7 @@ export function ReportProblemType() {
       { id: 'entrega_danificada', label: 'Carga danificada', category: 'Entrega', icon: AlertTriangle },
       { id: 'doc_falta', label: 'Documentação incompleta', category: 'Documentação', icon: FileText },
       { id: 'doc_erro', label: 'Erro na NF/CTE', category: 'Documentação', icon: FileText },
+      { id: 'checklist_divergencia', label: 'Divergência no Check List', category: 'Check List', icon: ClipboardX },
       { id: 'outro', label: 'Outro motivo', category: 'Outro', icon: MoreHorizontal },
     ];
 
@@ -182,7 +184,13 @@ export function ReportProblemType() {
             if (step === 'of_selection') {
               setStep('type_selection');
             } else {
-              navigate('/trip/report-problem/details', { state: { type: selected, ofs: selectedOFs } });
+              navigate('/trip/report-problem/details', {
+                state: {
+                  type: selected,
+                  ofs: selectedOFs,
+                  ...(selected === 'checklist_divergencia' && { checklistDivergence: true })
+                }
+              });
             }
           }} 
           className="w-full h-14 text-lg font-bold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-2xl shadow-lg shadow-orange-500/20 transition-all duration-300 disabled:opacity-50 disabled:from-slate-300 disabled:to-slate-400 dark:disabled:from-slate-800 dark:disabled:to-slate-900"

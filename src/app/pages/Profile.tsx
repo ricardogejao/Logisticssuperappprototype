@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { 
-  ArrowLeft, 
-  User, 
-  Truck, 
-  CreditCard, 
-  Settings, 
-  LogOut, 
+import {
+  ArrowLeft,
+  User,
+  Truck,
+  CreditCard,
+  Settings,
+  LogOut,
   ChevronRight,
   Star,
   ShieldCheck,
   FileText,
   Receipt,
-  Trash2
+  Trash2,
+  FlaskConical,
+  ClipboardList
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { BottomNav } from '../components/ui/bottom-nav';
@@ -148,7 +150,7 @@ export function Profile() {
                 ))}
             </div>
 
-            <Button 
+            <Button
                 variant="ghost"
                 className="w-full mt-6 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 h-12 rounded-xl font-medium"
                 onClick={() => navigate('/login')}
@@ -156,6 +158,36 @@ export function Profile() {
                 <LogOut className="w-4 h-4 mr-2" />
                 Sair da conta
             </Button>
+
+            {/* Prototype Simulations */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2 ml-1 mb-3">
+                <FlaskConical className="w-3.5 h-3.5 text-violet-400" />
+                <h3 className="text-xs font-bold text-violet-400 uppercase tracking-wider">Simulações do Protótipo</h3>
+              </div>
+              <div className="bg-violet-50 dark:bg-violet-900/10 rounded-2xl border border-violet-100 dark:border-violet-900/30 overflow-hidden">
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('PROTOTYPE_ONBOARDING_CHECKLIST_DONE');
+                    navigate('/checklist', {
+                      state: { onboardingChecklist: true, eventName: 'Cadastro', returnTo: '/home' }
+                    });
+                  }}
+                  className="w-full flex items-center justify-between p-4 hover:bg-violet-100/50 dark:hover:bg-violet-900/20 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400">
+                      <ClipboardList className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">Check List de Onboarding</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">Simular primeiro acesso</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-violet-300 dark:text-violet-700" />
+                </button>
+              </div>
+            </div>
 
             <div className="text-center mt-6">
                 <p className="text-xs text-slate-400 dark:text-slate-500">Versão 1.0.0</p>

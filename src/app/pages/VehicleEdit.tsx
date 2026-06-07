@@ -5,7 +5,7 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Switch } from "../components/ui/switch";
 import { useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Trash2, Plus, Truck } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, Truck, FileText, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function VehicleEdit() {
@@ -507,9 +507,44 @@ export function VehicleEdit() {
                      )}
                 </div>
 
+                {/* 6. Documentos */}
+                <div className="space-y-4">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Documentos</h3>
+
+                    {/* CRLV */}
+                    <button
+                        type="button"
+                        onClick={() => toast('CRLV não disponível no protótipo')}
+                        className="w-full flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-800 transition-colors text-left"
+                    >
+                        <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm shrink-0">
+                            <FileText className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">CRLV do veículo</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{formData.plate || 'Placa não informada'}</p>
+                        </div>
+                    </button>
+
+                    {/* Check List — visível apenas para proprietários */}
+                    <button
+                        type="button"
+                        onClick={() => navigate('/checklist', { state: { vehicleChecklist: true, plate: formData.plate, returnTo: `-1` } })}
+                        className="w-full flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-800 transition-colors text-left"
+                    >
+                        <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm shrink-0">
+                            <ClipboardList className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Check List do veículo</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">Ver / Responder questionário</p>
+                        </div>
+                    </button>
+                </div>
+
                 <div className="pt-4 pb-20">
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         className="w-full h-14 text-lg font-bold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-[0.99]"
                     >
                         Salvar alterações

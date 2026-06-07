@@ -62,6 +62,7 @@ import { CancellationConfirm } from './pages/CancellationConfirm';
 import { CancellationDetails } from './pages/CancellationDetails';
 import { CancellationSuccess } from './pages/CancellationSuccess';
 import { DesignTokens } from './pages/DesignTokens';
+import { CheckList } from './pages/CheckList';
 import { Toaster } from './components/ui/sonner';
 import { useBannerMode } from './hooks/useBannerMode';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -195,6 +196,7 @@ const router = createBrowserRouter([
             { path: "transaction/:id", element: <TransactionDetails /> },
         ]
       },
+      { path: "checklist", element: <CheckList /> },
       { path: "design-tokens", element: <DesignTokens /> },
       { path: "help/article/:id", element: <ArticleDetails /> },
       { path: "*", element: <Navigate to="/home" replace /> }

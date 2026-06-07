@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { Home, Search, Map, User } from 'lucide-react';
+import { Home, Map, User, HelpCircle } from 'lucide-react';
 import { cn } from './utils';
 
 export function BottomNav() {
@@ -20,9 +20,9 @@ export function BottomNav() {
 
   const items = [
     { label: 'Home', icon: Home, path: '/home' },
-    { label: 'Ofertas', icon: Search, path: '/marketplace' },
     { label: 'Viagens', icon: Map, path: '/trips' },
-    { label: 'Perfil', icon: User, path: '/profile' }, // Placeholder path
+    { label: 'Perfil', icon: User, path: '/profile' },
+    { label: 'Ajuda', icon: HelpCircle, path: '/help' },
   ];
 
   return (

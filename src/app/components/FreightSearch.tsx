@@ -39,7 +39,7 @@ export function FreightSearch({ onSearch, activeVehicle }: FreightSearchProps) {
   // Business Logic: Handle Tab Switching
   useEffect(() => {
     if (activeTab === 'destination') {
-      setDestination("Minha casa");
+      setDestination("Próx. da minha casa");
       setOrigin("Todas");
     } else {
       setOrigin("Minha localização atual");
@@ -117,11 +117,6 @@ export function FreightSearch({ onSearch, activeVehicle }: FreightSearchProps) {
               </p>
               <div className="flex items-baseline gap-1 font-bold">
                 <span className="text-[14px] text-white">{activeVehicle.plate}</span>
-                {activeVehicle.trailers.length > 0 && (
-                  <span className="font-normal text-[#90a1b9] text-[12px] tracking-[0.35px]">
-                    + {activeVehicle.trailers.join(', ')}
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -200,7 +195,7 @@ export function FreightSearch({ onSearch, activeVehicle }: FreightSearchProps) {
                 {activeTab === 'origin' ? (
                   <>
                     <SelectItem value="Minha localização atual" className="text-white focus:bg-slate-800">
-                      Minha localização atual ({radius}km)
+                      Minha localização atual
                     </SelectItem>
                     {availableOriginsList.filter(o => o !== "Minha localização atual").map((city) => (
                       <SelectItem key={city} value={city} className="text-white focus:bg-slate-800">
@@ -238,7 +233,7 @@ export function FreightSearch({ onSearch, activeVehicle }: FreightSearchProps) {
             <Select value={destination} onValueChange={setDestination}>
               <SelectTrigger className={`bg-[rgba(38,38,38,0.3)] h-[56px] w-full rounded-[8px] border-[1.17px] focus:ring-0 px-[16px] flex items-center justify-between shadow-none transition-all duration-300 ${activeTab === 'destination' ? 'border-[#ff6900]' : 'border-[#45556c]'} [&>svg]:hidden`}>
                 <div className={`text-left font-bold text-[16px] ${destination === "Todos" && activeTab === 'origin' ? 'text-[#45556c]' : 'text-white'}`}>
-                  <SelectValue placeholder={activeTab === 'destination' ? "Minha casa" : "Todos"} />
+                  <SelectValue placeholder={activeTab === 'destination' ? "Próx. da minha casa" : "Todos"} />
                 </div>
                 <div className="shrink-0 size-[16px] opacity-60">
                   <svg className="size-full" fill="none" viewBox="0 0 16 16">
@@ -249,8 +244,8 @@ export function FreightSearch({ onSearch, activeVehicle }: FreightSearchProps) {
               <SelectContent className="bg-[#1e293b] border-[#1d293d] max-h-[300px]">
                 {activeTab === 'destination' ? (
                   <>
-                    <SelectItem value="Minha casa" className="text-white focus:bg-slate-800">Minha casa</SelectItem>
-                    {availableDestinationsList.filter(d => d !== "Minha casa").map((city) => (
+                    <SelectItem value="Próx. da minha casa" className="text-white focus:bg-slate-800">Próx. da minha casa</SelectItem>
+                    {availableDestinationsList.filter(d => d !== "Próx. da minha casa").map((city) => (
                       <SelectItem key={city} value={city} className="text-white focus:bg-slate-800">
                         {city}
                       </SelectItem>

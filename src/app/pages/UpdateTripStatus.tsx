@@ -33,6 +33,16 @@ export function UpdateTripStatus() {
     if (savedStatus) {
       setSelectedStatus(savedStatus);
     }
+
+    // Retorno do Check List: continuar para verificação de identidade
+    const checklistDone = localStorage.getItem('PROTOTYPE_CHECKLIST_DONE');
+    const pendingStatus = localStorage.getItem('PROTOTYPE_PENDING_STATUS');
+    if (checklistDone === 'true' && pendingStatus) {
+      localStorage.removeItem('PROTOTYPE_CHECKLIST_DONE');
+      localStorage.removeItem('PROTOTYPE_PENDING_STATUS');
+      setSelectedStatus(pendingStatus);
+      setCurrentView('identity_verification');
+    }
   }, []);
 
   const statuses = [
@@ -58,13 +68,15 @@ export function UpdateTripStatus() {
         localStorage.setItem('PROTOTYPE_TRIP_ACTIVE', 'true');
         
         toast.success("Status e detalhes atualizados!");
-        navigate(-1);
+        navigate('/trip/details', { replace: true });
     }
   };
 
   const handleSave = () => {
     if (selectedStatus === 'Apresentação para Coleta' || selectedStatus === 'Apresentação para Entrega') {
-      setCurrentView('identity_verification');
+      // Passar pelo Check List antes da verificação de identidade
+      localStorage.setItem('PROTOTYPE_PENDING_STATUS', selectedStatus);
+      navigate('/checklist', { state: { eventName: selectedStatus, returnTo: '/trip/status' } });
       return;
     }
 
@@ -131,7 +143,7 @@ export function UpdateTripStatus() {
                 </div>
 
                 {!isVerifying && (
-                  <Button onClick={handleStartVerification} className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-12">
+                  <Button onClick={handleStartVerification} className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-12 shadow-none">
                     Iniciar verificação
                   </Button>
                 )}

@@ -47,7 +47,7 @@ export function AccountStatus() {
           description: "Seu cadastro foi aprovado. Você já pode visualizar as ofertas disponíveis.",
           bgColor: "bg-emerald-50/30 dark:bg-emerald-500/10",
           button: (
-            <Button 
+            <Button
                 onClick={() => navigate('/home')}
                 className="w-full h-14 text-lg font-bold bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-2xl shadow-lg shadow-orange-500/20 border-0"
             >

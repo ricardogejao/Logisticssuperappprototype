@@ -51,10 +51,10 @@ export function Login() {
                 </p>
             </div>
 
-            <form className="space-y-5" onSubmit={(e) => { 
-                e.preventDefault(); 
+            <form className="space-y-5" onSubmit={(e) => {
+                e.preventDefault();
                 localStorage.setItem('PROTOTYPE_AUTH_STATE', 'true');
-                navigate('/home'); 
+                navigate('/home');
             }}>
                 <div className="space-y-2">
                     <Label htmlFor="cpf" className="text-white font-bold text-sm pl-1">CPF</Label>
