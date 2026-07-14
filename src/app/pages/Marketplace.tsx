@@ -36,12 +36,13 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import moppIcon from '../../imports/logo_mopp_losango_v2-1.png';
 
 import { PromotionBanner } from '../components/PromotionBanner';
-import walletBanner from 'figma:asset/a660d4af783655321eb4855e5ebb294fc084e5b0.png';
 import trackerThingsBanner from '../../imports/banner_principal.png';
 import upperBanner1 from '../../imports/gustavo---24-horas-cargaPrancheta-1.png';
 import upperBanner2 from '../../imports/gustavo---24-horas-cargaPrancheta-1-copiar.png';
 import upperBanner3 from '../../imports/gustavo---24-horas-cargaPrancheta-1-1.png';
 import { useBannerMode } from '../hooks/useBannerMode';
+import horizontalBanner1 from '../../assets/Banner_Upper_Horizontal_01.png';
+import horizontalBanner2 from '../../assets/Banner_Upper_Horizontal_02.png';
 
 // --- Types ---
 // Removed locally defined Offer interface to use imported one
@@ -884,15 +885,15 @@ export function Marketplace() {
                       {index === 1 && (
                         <PromotionBanner
                           image={
-                            bannerMode === 'goodyear' 
-                              ? walletBanner 
-                              : bannerMode === 'trackerthings' 
-                              ? trackerThingsBanner 
-                              : upperBanner
+                            bannerMode === 'trackerthings'
+                              ? trackerThingsBanner
+                              : bannerMode === 'upper'
+                              ? upperBanner
+                              : [horizontalBanner1, horizontalBanner2][Math.floor(Math.random() * 2)]
                           }
                           onClick={() => {
                             const messages = {
-                              goodyear: "Aproveite os descontos Goodyear MaxSeries!",
+                              goodyear: "Confira nossas novidades!",
                               trackerthings: "Conheça TrackerThings!",
                               upper: "Seja um motorista mais valorizado com a Upper!"
                             };
