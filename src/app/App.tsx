@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  createBrowserRouter, 
-  RouterProvider, 
-  Navigate, 
-  useParams, 
-  useLocation, 
+import {
+  createHashRouter,
+  RouterProvider,
+  Navigate,
+  useParams,
+  useLocation,
   useNavigate,
   Outlet
 } from 'react-router';
@@ -125,7 +125,7 @@ function RootLayout() {
   );
 }
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <RootLayout />,
@@ -202,7 +202,7 @@ const router = createBrowserRouter([
       { path: "*", element: <Navigate to="/home" replace /> }
     ]
   },
-], { basename: import.meta.env.BASE_URL });
+]);
 
 export default function App() {
   return (
