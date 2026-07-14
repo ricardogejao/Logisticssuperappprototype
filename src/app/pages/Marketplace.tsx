@@ -498,12 +498,21 @@ const FloatingToggle = ({ mode, onClick }: { mode: 'list' | 'map', onClick: () =
 export function Marketplace() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { bannerMode } = useBannerMode();
+  const { bannerMode, setBannerMode } = useBannerMode();
 
   const upperBanner = useMemo(() => {
     const banners = [upperBanner1, upperBanner2, upperBanner3];
     return banners[Math.floor(Math.random() * banners.length)];
   }, []);
+
+  // Independent banner rotation for Marketplace
+  useEffect(() => {
+    const modes: ('goodyear' | 'trackerthings' | 'upper')[] = ['goodyear', 'trackerthings', 'upper'];
+    const interval = setInterval(() => {
+      setBannerMode(modes[(modes.indexOf(bannerMode) + 1) % modes.length]);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [bannerMode, setBannerMode]);
 
   const mode = searchParams.get('mode');
   const nearHomeParam = searchParams.get('near_home') === 'true'; // Item 9.5
@@ -883,7 +892,26 @@ export function Marketplace() {
                       
                       {/* Promo Banner after the 2nd card (index 1) */}
                       {index === 1 && (
-                        <PromotionBanner
+                        <div className="flex flex-col gap-2">
+                          {/* Manual banner selector */}
+                          <div className="flex items-center gap-2 px-1">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Banner:</span>
+                            {(['goodyear', 'trackerthings', 'upper'] as const).map((mode) => (
+                              <button
+                                key={mode}
+                                onClick={() => setBannerMode(mode)}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-full text-[10px] font-bold transition-all",
+                                  bannerMode === mode
+                                    ? "bg-orange-500 text-white"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                )}
+                              >
+                                {mode === 'goodyear' ? 'C24h' : mode === 'trackerthings' ? 'Tracker' : 'Upper'}
+                              </button>
+                            ))}
+                          </div>
+                          <PromotionBanner
                           image={
                             bannerMode === 'trackerthings'
                               ? trackerThingsBanner
@@ -900,6 +928,7 @@ export function Marketplace() {
                             toast.info(messages[bannerMode]);
                           }}
                         />
+                        </div>
                       )}
                     </div>
                   ))
