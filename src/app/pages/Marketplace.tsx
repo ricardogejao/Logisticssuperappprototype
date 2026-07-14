@@ -41,8 +41,7 @@ import upperBanner1 from '../../imports/gustavo---24-horas-cargaPrancheta-1.png'
 import upperBanner2 from '../../imports/gustavo---24-horas-cargaPrancheta-1-copiar.png';
 import upperBanner3 from '../../imports/gustavo---24-horas-cargaPrancheta-1-1.png';
 import { useBannerMode } from '../hooks/useBannerMode';
-import horizontalBanner1 from '../../assets/Banner_Upper_Horizontal_01.png';
-import horizontalBanner2 from '../../assets/Banner_Upper_Horizontal_02.png';
+import goodyearBanner from 'figma:asset/a660d4af783655321eb4855e5ebb294fc084e5b0.png';
 
 // --- Types ---
 // Removed locally defined Offer interface to use imported one
@@ -798,7 +797,7 @@ export function Marketplace() {
                   : "bg-white/15 text-white/80 hover:bg-white/25"
               )}
             >
-              {mode === 'goodyear' ? 'C24h' : mode === 'trackerthings' ? 'Tracker' : 'Upper'}
+              {mode === 'goodyear' ? 'Goodyear' : mode === 'trackerthings' ? 'Tracker' : 'Upper'}
             </button>
           ))}
         </div>
@@ -918,7 +917,7 @@ export function Marketplace() {
                               ? trackerThingsBanner
                               : bannerMode === 'upper'
                               ? upperBanner
-                              : [horizontalBanner1, horizontalBanner2][Math.floor(Math.random() * 2)]
+                              : goodyearBanner
                           }
                           onClick={() => {
                             const messages = {
