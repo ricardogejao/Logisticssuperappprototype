@@ -784,6 +784,25 @@ export function Marketplace() {
           </Button>
         </div>
 
+        {/* Banner Selector */}
+        <div className="flex items-center gap-2 pointer-events-auto px-1">
+          <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider shrink-0">Banner:</span>
+          {(['goodyear', 'trackerthings', 'upper'] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setBannerMode(mode)}
+              className={cn(
+                "px-3 py-1 rounded-full text-[11px] font-bold transition-all shadow-sm",
+                bannerMode === mode
+                  ? "bg-orange-500 text-white shadow-orange-500/30"
+                  : "bg-white/15 text-white/80 hover:bg-white/25"
+              )}
+            >
+              {mode === 'goodyear' ? 'C24h' : mode === 'trackerthings' ? 'Tracker' : 'Upper'}
+            </button>
+          ))}
+        </div>
+
         {/* Active Filter Chips */}
         {hasActiveFilters && (
           <div className="flex gap-2 overflow-x-auto pointer-events-auto no-scrollbar pb-2 px-1 mask-linear-fade">
@@ -893,24 +912,6 @@ export function Marketplace() {
                       {/* Promo Banner after the 2nd card (index 1) */}
                       {index === 1 && (
                         <div className="flex flex-col gap-2">
-                          {/* Manual banner selector */}
-                          <div className="flex items-center gap-2 px-1">
-                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Banner:</span>
-                            {(['goodyear', 'trackerthings', 'upper'] as const).map((mode) => (
-                              <button
-                                key={mode}
-                                onClick={() => setBannerMode(mode)}
-                                className={cn(
-                                  "px-2.5 py-1 rounded-full text-[10px] font-bold transition-all",
-                                  bannerMode === mode
-                                    ? "bg-orange-500 text-white"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
-                                )}
-                              >
-                                {mode === 'goodyear' ? 'C24h' : mode === 'trackerthings' ? 'Tracker' : 'Upper'}
-                              </button>
-                            ))}
-                          </div>
                           <PromotionBanner
                           image={
                             bannerMode === 'trackerthings'
