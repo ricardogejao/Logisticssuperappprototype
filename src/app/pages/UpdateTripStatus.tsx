@@ -5,6 +5,16 @@ import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Checkbox } from '../components/ui/checkbox';
 import { motion, AnimatePresence } from 'motion/react';
+import { ChecklistSheet } from '../components/checklist/ChecklistSheet';
+import { getChecklistFor, isChecklistPending } from '../utils/checklist';
+import { ChecklistDefinition, ChecklistEvent } from '../types/checklist';
+import { MOCK_OFFERS } from '../data/mocks';
+
+// A viagem ativa do protótipo não carrega o id da oferta original (é um
+// estado global simulado via localStorage), então usamos o mesmo cliente
+// demo já usado na contratação para manter o checklist de coleta/entrega
+// consistente com o resto do fluxo.
+const ACTIVE_TRIP_SHIPPER = MOCK_OFFERS[0]?.shipper || '';
 
 export function UpdateTripStatus() {
   const navigate = useNavigate();
@@ -12,6 +22,10 @@ export function UpdateTripStatus() {
   const [currentView, setCurrentView] = useState<'selection' | 'identity_verification' | 'nf_confirmation'>('selection');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
+
+  // Checklist de coleta/entrega (quando o cliente configurou um para o evento)
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const [activeChecklist, setActiveChecklist] = useState<ChecklistDefinition | null>(null);
   
   // NF State
   const [nfs, setNfs] = useState([
@@ -62,9 +76,20 @@ export function UpdateTripStatus() {
     }
   };
 
+  const goToIdentityVerification = () => setCurrentView('identity_verification');
+
   const handleSave = () => {
     if (selectedStatus === 'Apresentação para Coleta' || selectedStatus === 'Apresentação para Entrega') {
-      setCurrentView('identity_verification');
+      const event: ChecklistEvent = selectedStatus === 'Apresentação para Coleta' ? 'coleta' : 'entrega';
+      const checklist = getChecklistFor(ACTIVE_TRIP_SHIPPER, event);
+
+      if (checklist && isChecklistPending(checklist)) {
+        setActiveChecklist(checklist);
+        setIsChecklistOpen(true);
+        return;
+      }
+
+      goToIdentityVerification();
       return;
     }
 
@@ -322,13 +347,22 @@ export function UpdateTripStatus() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-[#1e293b] border-t border-slate-200 dark:border-slate-800 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-          <Button 
+          <Button
             onClick={handleSave}
             className="w-full h-12 text-base font-bold bg-slate-900 dark:bg-orange-500 hover:bg-slate-800 dark:hover:bg-orange-600 text-white rounded-xl shadow-lg shadow-slate-900/10 dark:shadow-orange-500/20 transition-all"
           >
               Salvar alterações
           </Button>
       </div>
+
+      {activeChecklist && (
+        <ChecklistSheet
+          open={isChecklistOpen}
+          onOpenChange={setIsChecklistOpen}
+          checklist={activeChecklist}
+          onComplete={goToIdentityVerification}
+        />
+      )}
 
     </div>
   );

@@ -11,6 +11,13 @@ export function OccurrenceDetails() {
   // Simulation of states: analysis | treatment | resolved
   const state = (searchParams.get('status') || 'analysis') as 'analysis' | 'treatment' | 'resolved';
 
+  // Quando a ocorrência foi aberta automaticamente por uma resposta de
+  // checklist divergente da esperada (ver src/app/utils/checklist.ts),
+  // refletimos o motivo real em vez do texto padrão de "problema com a carga".
+  const occurrenceReason = typeof window !== 'undefined' ? localStorage.getItem('PROTOTYPE_OCCURRENCE_REASON') : null;
+  const occurrenceSource = typeof window !== 'undefined' ? localStorage.getItem('PROTOTYPE_OCCURRENCE_SOURCE') : null;
+  const isChecklistOccurrence = occurrenceReason === 'Checklist inválido';
+
   const statusConfigs = {
     analysis: {
       title: "Em análise",
@@ -101,17 +108,19 @@ export function OccurrenceDetails() {
             <div className="grid grid-cols-2 gap-x-8 gap-y-6">
                 <div>
                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mb-1">Tipo</p>
-                    <p className="text-base font-medium text-slate-900 dark:text-white">Problema com a carga</p>
+                    <p className="text-base font-medium text-slate-900 dark:text-white">{occurrenceReason || 'Problema com a carga'}</p>
                 </div>
                 <div>
                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mb-1">Data e hora</p>
                     <p className="text-base font-medium text-slate-900 dark:text-white">Hoje, 14:20</p>
                 </div>
                 <div className="col-span-2">
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mb-2">Sua descrição</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mb-2">{isChecklistOccurrence ? 'Origem' : 'Sua descrição'}</p>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
                         <p className="text-sm text-slate-600 dark:text-slate-300 font-light leading-relaxed italic">
-                            "O lacre da carga principal apresenta sinais de violação. Aguardando orientações sobre como proceder."
+                            {isChecklistOccurrence
+                                ? `Uma resposta do "${occurrenceSource || 'checklist'}" divergiu do esperado. Aguardando análise do planejador.`
+                                : '"O lacre da carga principal apresenta sinais de violação. Aguardando orientações sobre como proceder."'}
                         </p>
                     </div>
                 </div>

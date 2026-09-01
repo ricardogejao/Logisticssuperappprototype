@@ -157,6 +157,8 @@ function RootLayout() {
 const router = createBrowserRouter([
   {
     path: "/",
+    // note: matches vite.config.ts's `base` — required so routing works when
+    // served from GitHub Pages at /Logisticssuperappprototype/ instead of /
     element: <RootLayout />,
     children: [
       { index: true, element: <Navigate to="/login" replace /> },
@@ -230,7 +232,9 @@ const router = createBrowserRouter([
       { path: "*", element: <Navigate to="/home" replace /> }
     ]
   },
-]);
+], {
+  basename: '/Logisticssuperappprototype/',
+});
 
 export default function App() {
   return (

@@ -17,6 +17,8 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  // Serve correctly from GitHub Pages project sites (https://<user>.github.io/<repo>/)
+  base: '/Logisticssuperappprototype/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if

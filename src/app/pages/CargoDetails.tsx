@@ -23,6 +23,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
+import { ChecklistSheet } from '../components/checklist/ChecklistSheet';
+import { getChecklistFor, isChecklistPending } from '../utils/checklist';
 
 export function CargoDetails() {
   const { id } = useParams();
@@ -49,6 +51,9 @@ export function CargoDetails() {
   // Negotiation State
   const [isNegotiationOpen, setIsNegotiationOpen] = useState(false);
   const [negotiationAdjustment, setNegotiationAdjustment] = useState(0);
+
+  // Checklist de contratação (quando o cliente configurou um para este evento)
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
   if (!offer) {
     return (
@@ -91,23 +96,38 @@ export function CargoDetails() {
 
   const submitInterest = () => {
     if (isNegotiationOpen) setIsNegotiationOpen(false);
-    navigate(`/offer/${id}/contract-acceptance`, { 
-        state: { 
+    navigate(`/offer/${id}/contract-acceptance`, {
+        state: {
             negotiationAdjustment,
             isNegotiation: true
-        } 
+        }
     });
   };
 
-  const handleMainAction = () => {
-    if (hasApplied) return;
-    if (!termsAccepted) return;
-
+  const proceedAfterChecklist = () => {
     if (offer.isNegotiable) {
         setIsNegotiationOpen(true);
     } else {
         submitInterest();
     }
+  };
+
+  // Cliente pode exigir um checklist antes de confirmar interesse. Uma
+  // resposta divergente não bloqueia a contratação — só abre uma ocorrência
+  // (ver ChecklistSheet) — por isso sempre seguimos após o checklist.
+  const contratacaoChecklist = getChecklistFor(offer.shipper, 'contratacao');
+  const checklistRequired = !!contratacaoChecklist && isChecklistPending(contratacaoChecklist);
+
+  const handleMainAction = () => {
+    if (hasApplied) return;
+    if (!termsAccepted) return;
+
+    if (checklistRequired) {
+        setIsChecklistOpen(true);
+        return;
+    }
+
+    proceedAfterChecklist();
   };
 
   const adjustNegotiation = (amount: number) => {
@@ -377,6 +397,12 @@ export function CargoDetails() {
                     <span className="text-sm font-medium">Você já enviou interesse para essa carga.</span>
                 </div>
             )}
+            {!hasApplied && checklistRequired && (
+                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-3 rounded-xl border border-blue-100 dark:border-blue-800 mb-2">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-sm font-medium">Este cliente exige um checklist antes de confirmar interesse.</span>
+                </div>
+            )}
             {hasApplied ? (
                 <Button variant="outline" onClick={() => navigate('/my-applications')} className="w-full h-14 text-lg border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl">
                     Ver minhas candidaturas
@@ -428,6 +454,15 @@ export function CargoDetails() {
             </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {contratacaoChecklist && (
+        <ChecklistSheet
+          open={isChecklistOpen}
+          onOpenChange={setIsChecklistOpen}
+          checklist={contratacaoChecklist}
+          onComplete={proceedAfterChecklist}
+        />
+      )}
 
       <AlertDialog open={showError} onOpenChange={setShowError}>
         <AlertDialogContent className="rounded-2xl max-w-[90%] w-[400px] dark:bg-[#1e293b] dark:border-slate-800">

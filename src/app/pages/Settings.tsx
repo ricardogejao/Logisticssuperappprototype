@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { 
-  ArrowLeft, 
-  Bell, 
-  MapPin, 
-  Globe, 
-  Navigation, 
-  Map, 
-  CreditCard, 
-  ChevronRight
+import {
+  ArrowLeft,
+  Bell,
+  MapPin,
+  Globe,
+  Navigation,
+  Map,
+  CreditCard,
+  ChevronRight,
+  RotateCcw
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
@@ -38,6 +39,23 @@ export function Settings() {
   const [autoTripMode, setAutoTripMode] = useState(true);
   const [altRoutes, setAltRoutes] = useState(true);
   const [showTolls, setShowTolls] = useState(true);
+
+  // Apenas para testes do protótipo — não existe em produção. Apaga tudo o
+  // que foi simulado via localStorage (login, viagem, ocorrências, respostas
+  // de checklist) e volta pro início, sem depender do DevTools.
+  const handleResetPrototype = () => {
+    const confirmed = window.confirm(
+      'Isso vai apagar login, viagem, ocorrências e respostas de checklist salvos neste navegador. Continuar?'
+    );
+    if (!confirmed) return;
+
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith('PROTOTYPE_'))
+      .forEach((key) => localStorage.removeItem(key));
+
+    toast.success('Protótipo resetado! Voltando para o login...');
+    setTimeout(() => navigate('/login', { replace: true }), 500);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans transition-colors duration-300">
@@ -193,6 +211,27 @@ export function Settings() {
                     <span className="text-sm text-slate-500 dark:text-slate-400">Versão 1.0.0</span>
                 </div>
 
+            </div>
+        </section>
+
+        {/* Protótipo — visível só nesta versão de teste */}
+        <section className="space-y-3">
+            <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Protótipo</h2>
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                <button
+                    onClick={handleResetPrototype}
+                    className="w-full flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                            <RotateCcw className="w-5 h-5" />
+                        </div>
+                        <div className="text-left">
+                            <span className="block text-sm font-bold text-red-600 dark:text-red-400">Resetar protótipo</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block mt-0.5">Apaga login, viagem, ocorrências e checklists salvos e volta pro início</span>
+                        </div>
+                    </div>
+                </button>
             </div>
         </section>
 
