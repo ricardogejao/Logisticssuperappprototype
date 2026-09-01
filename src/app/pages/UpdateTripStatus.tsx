@@ -5,6 +5,19 @@ import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Checkbox } from '../components/ui/checkbox';
 import { motion, AnimatePresence } from 'motion/react';
+import { ChecklistSheet } from '../components/checklist/ChecklistSheet';
+import { getChecklistFor, isChecklistPending } from '../utils/checklist';
+import { ChecklistDefinition, ChecklistEvent } from '../types/checklist';
+import { MOCK_OFFERS } from '../data/mocks';
+
+// Viagem simulada única no protótipo: reaproveita o mesmo embarcador de
+// demonstração (oferta #1) já que não há um id de oferta real por trás dela.
+const ACTIVE_TRIP_SHIPPER = MOCK_OFFERS[0]?.shipper || '';
+
+const CHECKLIST_EVENT_BY_STATUS: Record<string, ChecklistEvent> = {
+  'Apresentação para Coleta': 'coleta',
+  'Apresentação para Entrega': 'entrega',
+};
 
 export function UpdateTripStatus() {
   const navigate = useNavigate();
@@ -12,7 +25,11 @@ export function UpdateTripStatus() {
   const [currentView, setCurrentView] = useState<'selection' | 'identity_verification' | 'nf_confirmation'>('selection');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
-  
+
+  // Checklist de coleta/entrega (bottom sheet, mesmo padrão da contratação)
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const [activeChecklist, setActiveChecklist] = useState<ChecklistDefinition | null>(null);
+
   // NF State
   const [nfs, setNfs] = useState([
     { id: 'NF-001', checked: false },
@@ -32,16 +49,6 @@ export function UpdateTripStatus() {
     const savedStatus = localStorage.getItem('PROTOTYPE_TRIP_STATUS');
     if (savedStatus) {
       setSelectedStatus(savedStatus);
-    }
-
-    // Retorno do Check List: continuar para verificação de identidade
-    const checklistDone = localStorage.getItem('PROTOTYPE_CHECKLIST_DONE');
-    const pendingStatus = localStorage.getItem('PROTOTYPE_PENDING_STATUS');
-    if (checklistDone === 'true' && pendingStatus) {
-      localStorage.removeItem('PROTOTYPE_CHECKLIST_DONE');
-      localStorage.removeItem('PROTOTYPE_PENDING_STATUS');
-      setSelectedStatus(pendingStatus);
-      setCurrentView('identity_verification');
     }
   }, []);
 
@@ -72,11 +79,21 @@ export function UpdateTripStatus() {
     }
   };
 
+  const goToIdentityVerification = () => {
+    setCurrentView('identity_verification');
+  };
+
   const handleSave = () => {
-    if (selectedStatus === 'Apresentação para Coleta' || selectedStatus === 'Apresentação para Entrega') {
-      // Passar pelo Check List antes da verificação de identidade
-      localStorage.setItem('PROTOTYPE_PENDING_STATUS', selectedStatus);
-      navigate('/checklist', { state: { eventName: selectedStatus, returnTo: '/trip/status' } });
+    const checklistEvent = CHECKLIST_EVENT_BY_STATUS[selectedStatus];
+    if (checklistEvent) {
+      const checklist = getChecklistFor(ACTIVE_TRIP_SHIPPER, checklistEvent);
+      if (checklist && isChecklistPending(checklist)) {
+        setActiveChecklist(checklist);
+        setIsChecklistOpen(true);
+        return;
+      }
+      // Sem checklist pendente pra esse cliente/evento: segue direto pra verificação
+      goToIdentityVerification();
       return;
     }
 
@@ -341,6 +358,15 @@ export function UpdateTripStatus() {
               Salvar alterações
           </Button>
       </div>
+
+      {activeChecklist && (
+        <ChecklistSheet
+          open={isChecklistOpen}
+          onOpenChange={setIsChecklistOpen}
+          checklist={activeChecklist}
+          onComplete={goToIdentityVerification}
+        />
+      )}
 
     </div>
   );

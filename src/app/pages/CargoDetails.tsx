@@ -5,6 +5,8 @@ import { Button } from '../components/ui/button';
 import { Checkbox } from '../components/ui/checkbox';
 import { cn } from '../components/ui/utils';
 import { MOCK_OFFERS } from '../data/mocks';
+import { ChecklistSheet } from '../components/checklist/ChecklistSheet';
+import { getChecklistFor, isChecklistPending } from '../utils/checklist';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +51,11 @@ export function CargoDetails() {
   // Negotiation State
   const [isNegotiationOpen, setIsNegotiationOpen] = useState(false);
   const [negotiationAdjustment, setNegotiationAdjustment] = useState(0);
+
+  // Checklist de contratação (bottom sheet, exigido antes de confirmar interesse)
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const contratacaoChecklist = offer ? getChecklistFor(offer.shipper, 'contratacao') : undefined;
+  const checklistRequired = !!contratacaoChecklist && isChecklistPending(contratacaoChecklist);
 
   if (!offer) {
     return (
@@ -99,15 +106,24 @@ export function CargoDetails() {
     });
   };
 
-  const handleMainAction = () => {
-    if (hasApplied) return;
-    if (!termsAccepted) return;
-
+  const proceedAfterChecklist = () => {
     if (offer.isNegotiable) {
         setIsNegotiationOpen(true);
     } else {
         submitInterest();
     }
+  };
+
+  const handleMainAction = () => {
+    if (hasApplied) return;
+    if (!termsAccepted) return;
+
+    if (checklistRequired) {
+        setIsChecklistOpen(true);
+        return;
+    }
+
+    proceedAfterChecklist();
   };
 
   const adjustNegotiation = (amount: number) => {
@@ -377,6 +393,12 @@ export function CargoDetails() {
                     <span className="text-sm font-medium">Você já enviou interesse para essa carga.</span>
                 </div>
             )}
+            {!hasApplied && checklistRequired && (
+                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-3 rounded-xl border border-blue-100 dark:border-blue-800 mb-2">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-sm font-medium">Este cliente exige um checklist antes de confirmar interesse.</span>
+                </div>
+            )}
             {hasApplied ? (
                 <Button variant="outline" onClick={() => navigate('/my-applications')} className="w-full h-14 text-lg border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl">
                     Ver minhas candidaturas
@@ -442,6 +464,15 @@ export function CargoDetails() {
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {contratacaoChecklist && (
+        <ChecklistSheet
+          open={isChecklistOpen}
+          onOpenChange={setIsChecklistOpen}
+          checklist={contratacaoChecklist}
+          onComplete={proceedAfterChecklist}
+        />
+      )}
     </div>
   );
 }
