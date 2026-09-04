@@ -114,7 +114,9 @@ export function ChecklistSheet({ open, onOpenChange, checklist, onComplete }: Ch
       toast.success(checklist.finalMessage || 'Tudo certo! Respostas confirmadas.');
     } else {
       triggerChecklistOccurrence(checklist.name);
-      toast.warning('Respostas registradas. Uma ocorrência foi aberta e está aguardando análise.');
+      toast.warning(
+        'Uma ocorrência foi aberta para análise e disposição pelo contratante de uma ou mais divergências nas respostas do checklist. Aguarde instruções ou entre em contato com o contratante em caso de dúvidas.',
+      );
     }
 
     onOpenChange(false);

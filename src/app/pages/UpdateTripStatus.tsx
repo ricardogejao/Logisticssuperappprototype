@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Check, Camera, Upload, AlertCircle, UserCheck, X } from 'lucide-react';
+import { ArrowLeft, Check, Camera, Upload, UserCheck, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Checkbox } from '../components/ui/checkbox';
@@ -38,12 +38,6 @@ export function UpdateTripStatus() {
   ]);
 
   const allNfsChecked = nfs.every(nf => nf.checked);
-
-  // New Cargo Detail States
-  const [weight, setWeight] = useState('');
-  const [volume, setVolume] = useState('');
-  const [temperature, setTemperature] = useState('');
-  const [observations, setObservations] = useState('');
 
   useEffect(() => {
     const savedStatus = localStorage.getItem('PROTOTYPE_TRIP_STATUS');
@@ -83,19 +77,37 @@ export function UpdateTripStatus() {
     setCurrentView('identity_verification');
   };
 
-  const handleSave = () => {
-    const checklistEvent = CHECKLIST_EVENT_BY_STATUS[selectedStatus];
-    if (checklistEvent) {
-      const checklist = getChecklistFor(ACTIVE_TRIP_SHIPPER, checklistEvent);
-      if (checklist && isChecklistPending(checklist)) {
-        setActiveChecklist(checklist);
-        setIsChecklistOpen(true);
-        return;
-      }
+  /**
+   * Coleta/entrega exigem checklist: assim que o motorista seleciona um desses
+   * status, o checklist já abre em bottom sheet — sem precisar passar por um
+   * botão de "salvar" no meio (definido com o Ricardo). Retorna true quando o
+   * status disparou esse fluxo, pra quem chamar saber que não precisa seguir
+   * com a lógica padrão de salvar/avançar.
+   */
+  const maybeStartChecklistFlow = (status: string) => {
+    const checklistEvent = CHECKLIST_EVENT_BY_STATUS[status];
+    if (!checklistEvent) return false;
+
+    const checklist = getChecklistFor(ACTIVE_TRIP_SHIPPER, checklistEvent);
+    if (checklist && isChecklistPending(checklist)) {
+      setActiveChecklist(checklist);
+      setIsChecklistOpen(true);
+    } else {
       // Sem checklist pendente pra esse cliente/evento: segue direto pra verificação
       goToIdentityVerification();
-      return;
     }
+    return true;
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+    maybeStartChecklistFlow(newStatus);
+  };
+
+  const handleSave = () => {
+    // Fallback: se o motorista fechou o checklist sem responder e voltou a
+    // tocar em "Salvar alterações", reabre o mesmo fluxo em vez de ignorar.
+    if (maybeStartChecklistFlow(selectedStatus)) return;
 
     if (selectedStatus === 'Coletada') {
       setCurrentView('nf_confirmation');
@@ -264,9 +276,9 @@ export function UpdateTripStatus() {
                   Novo Status
               </h2>
               <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                  <select 
+                  <select
                     value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    onChange={(e) => handleStatusChange(e.target.value)}
                     className="w-full p-4 text-slate-900 dark:text-white font-bold bg-transparent outline-none appearance-none"
                     style={{ backgroundImage: 'none' }}
                   >
@@ -278,65 +290,7 @@ export function UpdateTripStatus() {
               <p className="text-xs text-slate-500 dark:text-slate-400 px-1">Selecione a etapa atual da viagem para notificar o contratante.</p>
           </div>
 
-          {/* 2. Cargo Details Inputs */}
-          <div className="space-y-4">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  Detalhes da Carga
-              </h2>
-              
-              <div className="bg-white dark:bg-[#1e293b] p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
-                  {/* Row 1: Weight & Volume */}
-                  <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Peso Real (kg)</label>
-                          <input 
-                            type="number" 
-                            placeholder="0"
-                            value={weight}
-                            onChange={(e) => setWeight(e.target.value)}
-                            className="w-full h-12 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                          />
-                      </div>
-                      <div className="space-y-1">
-                          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Volume (m³)</label>
-                          <input 
-                            type="number" 
-                            placeholder="0"
-                            value={volume}
-                            onChange={(e) => setVolume(e.target.value)}
-                            className="w-full h-12 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                          />
-                      </div>
-                  </div>
-
-                  {/* Row 2: Temp */}
-                  <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Temperatura Aferida (ºC)</label>
-                      <input 
-                        type="text" 
-                        placeholder="Ex: -18ºC"
-                        value={temperature}
-                        onChange={(e) => setTemperature(e.target.value)}
-                        className="w-full h-12 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                  </div>
-
-                  {/* Row 3: Obs */}
-                  <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Observações</label>
-                      <textarea 
-                        rows={3}
-                        placeholder="Alguma ocorrência ou observação relevante?"
-                        value={observations}
-                        onChange={(e) => setObservations(e.target.value)}
-                        className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-                      />
-                  </div>
-              </div>
-          </div>
-
-          {/* 3. Evidence / Photos (Structure Prep) */}
+          {/* 2. Evidence / Photos (Structure Prep) */}
           <div className="space-y-3">
               <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2">
                   <Camera className="w-4 h-4 text-blue-600 dark:text-blue-400" />
