@@ -63,6 +63,8 @@ import { CancellationDetails } from './pages/CancellationDetails';
 import { CancellationSuccess } from './pages/CancellationSuccess';
 import { DesignTokens } from './pages/DesignTokens';
 import { CheckList } from './pages/CheckList';
+import { PartnerCatalog } from './pages/PartnerCatalog';
+import { PaymentMethod } from './pages/PaymentMethod';
 import { Toaster } from './components/ui/sonner';
 import { useBannerMode } from './hooks/useBannerMode';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -197,6 +199,8 @@ const router = createHashRouter([
         ]
       },
       { path: "checklist", element: <CheckList /> },
+      { path: "partner/:type/catalog", element: <PartnerCatalog /> },
+      { path: "partner/payment", element: <PaymentMethod /> },
       { path: "design-tokens", element: <DesignTokens /> },
       { path: "help/article/:id", element: <ArticleDetails /> },
       { path: "*", element: <Navigate to="/home" replace /> }

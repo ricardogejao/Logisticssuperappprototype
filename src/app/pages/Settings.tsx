@@ -9,7 +9,8 @@ import {
   Map,
   CreditCard,
   ChevronRight,
-  RotateCcw
+  RotateCcw,
+  Store
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
@@ -217,7 +218,22 @@ export function Settings() {
         {/* Protótipo — visível só nesta versão de teste */}
         <section className="space-y-3">
             <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Protótipo</h2>
-            <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-50 dark:divide-slate-800">
+                <button
+                    onClick={() => navigate('/partner/implementos/catalog')}
+                    className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                            <Store className="w-5 h-5" />
+                        </div>
+                        <div className="text-left">
+                            <span className="block text-sm font-bold text-slate-900 dark:text-white">Preview: cardápio de parceiro + pagamento</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block mt-0.5">Fluxo novo (Getnet) — cardápio de produtos até a tela de pagamento</span>
+                        </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" />
+                </button>
                 <button
                     onClick={handleResetPrototype}
                     className="w-full flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
